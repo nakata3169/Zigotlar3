@@ -3311,4 +3311,333 @@ export default CallModal;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
   border: none;
- 
+   font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+  transition: all 0.2s;
+  color: white;
+}
+
+.controlBtn:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.controlBtn.active {
+  background: var(--accent-primary);
+}
+
+.rejectBtn {
+  background: var(--accent-danger);
+}
+
+.acceptBtn {
+  background: var(--accent-success);
+}
+
+.endCallBtn {
+  background: var(--accent-danger);
+  width: auto;
+  padding: 0 24px;
+  border-radius: 28px;
+  font-size: 16px;
+  gap: 8px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+          import { rtdb } from '../firebase/config';
+import { ref, set, onValue, remove } from 'firebase/database';
+
+class WebRTCService {
+  constructor() {
+    this.peerConnection = null;
+    this.localStream = null;
+    this.remoteStream = null;
+    this.callId = null;
+    this.userId = null;
+    this.onRemoteStream = null;
+    this.onCallEnded = null;
+    
+    this.configuration = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' }
+      ]
+    };
+  }
+
+  async initLocalStream(videoEnabled = true) {
+    const constraints = { video: videoEnabled, audio: true };
+    this.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+    return this.localStream;
+  }
+
+  async startCall(callId, userId, targetUserId, videoEnabled = true) {
+    this.callId = callId;
+    this.userId = userId;
+    await this.initLocalStream(videoEnabled);
+    this.createPeerConnection();
+    this.localStream.getTracks().forEach(track => {
+      this.peerConnection.addTrack(track, this.localStream);
+    });
+    const offer = await this.peerConnection.createOffer();
+    await this.peerConnection.setLocalDescription(offer);
+    const callRef = ref(rtdb, `calls/${callId}`);
+    await set(callRef, { from: userId, to: targetUserId, offer: offer, status: 'pending', videoEnabled, timestamp: Date.now() });
+    this.listenForAnswer(callId);
+    return this.callId;
+  }
+
+  createPeerConnection() {
+    this.peerConnection = new RTCPeerConnection(this.configuration);
+    this.peerConnection.onicecandidate = (event) => {
+      if (event.candidate && this.callId) {
+        const candidateRef = ref(rtdb, `calls/${this.callId}/candidates/${Date.now()}`);
+        set(candidateRef, event.candidate);
+      }
+    };
+    this.peerConnection.ontrack = (event) => {
+      this.remoteStream = event.streams[0];
+      if (this.onRemoteStream) this.onRemoteStream(this.remoteStream);
+    };
+    this.peerConnection.onconnectionstatechange = () => {
+      if (this.peerConnection.connectionState === 'disconnected') this.endCall();
+    };
+  }
+
+  async listenForAnswer(callId) {
+    const callRef = ref(rtdb, `calls/${callId}`);
+    onValue(callRef, async (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+      if (data.answer && !this.peerConnection.currentRemoteDescription) {
+        await this.peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+      }
+      if (data.status === 'ended') {
+        if (this.onCallEnded) this.onCallEnded();
+        this.endCall();
+      }
+    });
+    this.listenForIceCandidates(callId);
+  }
+
+  async acceptCall(callId, userId, videoEnabled = true) {
+    this.callId = callId;
+    this.userId = userId;
+    await this.initLocalStream(videoEnabled);
+    const callRef = ref(rtdb, `calls/${callId}`);
+    const snapshot = await new Promise(resolve => onValue(callRef, resolve, { onlyOnce: true }));
+    const callData = snapshot.val();
+    if (!callData) return;
+    this.createPeerConnection();
+    this.localStream.getTracks().forEach(track => {
+      this.peerConnection.addTrack(track, this.localStream);
+    });
+    await this.peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
+    const answer = await this.peerConnection.createAnswer();
+    await this.peerConnection.setLocalDescription(answer);
+    await set(callRef, { ...callData, answer: answer, status: 'active', acceptedAt: Date.now() });
+    this.listenForIceCandidates(callId);
+    return true;
+  }
+
+  listenForIceCandidates(callId) {
+    const candidatesRef = ref(rtdb, `calls/${callId}/candidates`);
+    onValue(candidatesRef, (snapshot) => {
+      const candidates = snapshot.val();
+      if (candidates) {
+        Object.values(candidates).forEach(async (candidate) => {
+          if (this.peerConnection && candidate) {
+            try {
+              await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+            } catch (e) {}
+          }
+        });
+      }
+    });
+  }
+
+  async endCall() {
+    if (this.localStream) {
+      this.localStream.getTracks().forEach(track => track.stop());
+      this.localStream = null;
+    }
+    if (this.peerConnection) {
+      this.peerConnection.close();
+      this.peerConnection = null;
+    }
+    if (this.callId) {
+      const callRef = ref(rtdb, `calls/${this.callId}`);
+      await set(callRef, { status: 'ended', endedAt: Date.now() });
+      setTimeout(async () => await remove(callRef), 5000);
+    }
+    this.callId = null;
+    this.remoteStream = null;
+  }
+
+  toggleAudio(enabled) {
+    if (this.localStream) {
+      this.localStream.getAudioTracks().forEach(track => track.enabled = enabled);
+    }
+  }
+
+  toggleVideo(enabled) {
+    if (this.localStream) {
+      this.localStream.getVideoTracks().forEach(track => track.enabled = enabled);
+    }
+  }
+
+  cleanup() {
+    this.endCall();
+  }
+}
+
+export default new WebRTCService();
+          import { rtdb } from '../firebase/config';
+import { ref, set, onValue, remove, update } from 'firebase/database';
+
+class CallService {
+  constructor() {
+    this.listeners = {};
+  }
+
+  async createCall(fromUserId, toUserId, callType, videoEnabled = true) {
+    const callId = `${fromUserId}_${toUserId}_${Date.now()}`;
+    const callRef = ref(rtdb, `calls/${callId}`);
+    await set(callRef, {
+      id: callId, from: fromUserId, to: toUserId, type: callType,
+      videoEnabled, status: 'pending', timestamp: Date.now()
+    });
+    return callId;
+  }
+
+  listenForCalls(userId, onIncomingCall) {
+    const callsRef = ref(rtdb, 'calls');
+    this.listeners[userId] = onValue(callsRef, (snapshot) => {
+      const calls = snapshot.val();
+      if (calls) {
+        Object.values(calls).forEach(call => {
+          if (call.to === userId && call.status === 'pending') {
+            onIncomingCall(call);
+          }
+        });
+      }
+    });
+  }
+
+  async acceptCall(callId) {
+    await update(ref(rtdb, `calls/${callId}`), { status: 'accepted', acceptedAt: Date.now() });
+  }
+
+  async rejectCall(callId) {
+    await update(ref(rtdb, `calls/${callId}`), { status: 'rejected', rejectedAt: Date.now() });
+    setTimeout(async () => await remove(ref(rtdb, `calls/${callId}`)), 5000);
+  }
+
+  async endCall(callId) {
+    await update(ref(rtdb, `calls/${callId}`), { status: 'ended', endedAt: Date.now() });
+    setTimeout(async () => await remove(ref(rtdb, `calls/${callId}`)), 5000);
+  }
+
+  stopListening(userId) {
+    if (this.listeners[userId]) {
+      this.listeners[userId]();
+      delete this.listeners[userId];
+    }
+  }
+}
+
+export default new CallService();
+          import { rtdb } from '../firebase/config';
+import { ref, push, set, onValue } from 'firebase/database';
+
+class NotificationService {
+  constructor() {
+    this.notifications = [];
+    this.listeners = [];
+  }
+
+  playSound(type) {
+    const sounds = {
+      message: '/assets/sounds/message-receive.mp3',
+      call: '/assets/sounds/call-start.mp3',
+      error: '/assets/sounds/error.mp3'
+    };
+    if (sounds[type]) {
+      const audio = new Audio(sounds[type]);
+      audio.play().catch(() => {});
+    }
+  }
+
+  async showNotification(title, message, type = 'info', data = null) {
+    if (Notification.permission === 'granted') {
+      new Notification(title, { body: message, icon: '/logo192.png' });
+    }
+    this.playSound(type);
+    const notification = {
+      id: Date.now(), title, message, type, data,
+      timestamp: Date.now(), read: false
+    };
+    this.notifications.unshift(notification);
+    this.notifyListeners();
+    if (window.currentUserId) {
+      const notifRef = ref(rtdb, `notifications/${window.currentUserId}`);
+      await push(notifRef, notification);
+    }
+    return notification;
+  }
+
+  async markAsRead(notificationId) {
+    const notification = this.notifications.find(n => n.id === notificationId);
+    if (notification) {
+      notification.read = true;
+      this.notifyListeners();
+      if (window.currentUserId) {
+        await set(ref(rtdb, `notifications/${window.currentUserId}/${notificationId}/read`), true);
+      }
+    }
+  }
+
+  async clearAll() {
+    this.notifications = [];
+    this.notifyListeners();
+    if (window.currentUserId) {
+      await set(ref(rtdb, `notifications/${window.currentUserId}`), null);
+    }
+  }
+
+  subscribe(listener) {
+    this.listeners.push(listener);
+    return () => { this.listeners = this.listeners.filter(l => l !== listener); };
+  }
+
+  notifyListeners() {
+    this.listeners.forEach(listener => listener(this.notifications));
+  }
+
+  async initUserNotifications(userId) {
+    window.currentUserId = userId;
+    if (Notification.permission === 'default') Notification.requestPermission();
+    const notifRef = ref(rtdb, `notifications/${userId}`);
+    onValue(notifRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const notifications = Object.entries(data).map(([id, notif]) => ({ id, ...notif }))
+          .sort((a, b) => b.timestamp - a.timestamp);
+        this.notifications = notifications;
+        this.notifyListeners();
+      }
+    });
+  }
+}
+
+export default new NotificationService();
+          git add .
+git commit -m "Zigotlar uygulaması tamamlandı"
+git push origin main
