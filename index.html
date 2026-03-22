@@ -1,0 +1,3314 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#0a0e1a" />
+  <meta name="description" content="Zigotlar - Discord tarzı sohbet uygulaması" />
+  <title>Zigotlar</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥚</text></svg>" />
+</head>
+<body>
+  <noscript>Uygulamayı çalıştırmak için JavaScript'i etkinleştirin.</noscript>
+  <div id="root"></div>
+</body>
+</html>
+{
+  "name": "zigotlar",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "firebase": "^10.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "use-sound": "^4.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": ["react-app"]
+  },
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+  }
+}
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# firebase
+.firebase
+
+# IDE
+.vscode
+.idea
+# 🥚 Zigotlar - Discord Tarzı Sohbet Uygulaması
+
+Firebase + React ile geliştirilmiş, gerçek zamanlı mesajlaşma, sesli/görüntülü arama ve medya paylaşımı özelliklerine sahip Discord benzeri bir sohbet uygulaması.
+
+## 🚀 Özellikler
+
+### 🔐 Giriş Sistemi
+- Kapı şifresi: `ruhi123`
+- Firebase Anonim Auth
+- SessionStorage ile oturum kontrolü
+
+### 💬 Mesajlaşma
+- Gerçek zamanlı mesajlaşma
+- Yazıyor... göstergesi
+- Mesaj düzenleme/silme/sabitleme
+- Yanıtlama (Reply) sistemi
+- Okundu bilgisi
+- @mention
+- Tarih bazlı mesaj grupları
+
+### 📁 Medya & Dosya
+- Fotoğraf/video/dosya yükleme
+- Sürükle-bırak desteği
+- Sesli mesaj kaydı
+- Medya galerisi
+- Tam ekran görüntüleyici
+
+### 📢 Kanallar
+- 6 varsayılan kanal
+- Yeni kanal oluşturma
+- Kanal susturma
+- Kanal konusu düzenleme
+
+### 👥 Arkadaşlık & DM
+- Arkadaş ekleme/çıkarma
+- Direkt mesajlaşma
+- Okunmamış mesaj sayacı
+- Kullanıcı durumları
+
+### 📞 Sesli/Görüntülü Arama
+- Firebase + WebRTC ile gerçek arama
+- Mikrofon/kamera kontrolleri
+- Arama timer
+
+### 🔔 Bildirimler
+- Toast bildirimleri
+- Bildirim geçmişi paneli
+- Tarayıcı push bildirimleri
+
+## 🛠️ Kurulum
+
+```bash
+git clone https://github.com/yourusername/zigotlar.git
+cd zigotlar
+npm install
+npm start
+
+---
+
+### DOSYA: `src/index.js`
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #0f1420;
+  --bg-tertiary: #151b2b;
+  --bg-hover: #1e2a3a;
+  --bg-active: #1e2a3a;
+  --border-color: #1e2a3a;
+  --text-primary: #e8f0fe;
+  --text-secondary: #8a9bb5;
+  --text-muted: #5a6e8a;
+  --accent-primary: #3b82f6;
+  --accent-secondary: #2563eb;
+  --accent-success: #10b981;
+  --accent-danger: #ef4444;
+  --accent-warning: #f59e0b;
+  --online: #10b981;
+  --away: #f59e0b;
+  --dnd: #ef4444;
+  --offline: #6b7280;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.zigot-logo-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.zigot-logo-loading .logo-icon {
+  font-size: 64px;
+  animation: bounce 1s infinite;
+}
+
+.zigot-logo-loading .logo-text {
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+import React, { useState, useEffect } from 'react';
+import Gate from './components/Gate/Gate';
+import MainApp from './components/MainApp/MainApp';
+import { auth } from './firebase/config';
+import { onAuthStateChanged } from 'firebase/auth';
+import { initDefaultChannels } from './firebase/realtime';
+import './index.css';
+
+function App() {
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isGatePassed, setIsGatePassed] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) setUser(firebaseUser);
+      else setUser(null);
+      setIsLoading(false);
+    });
+
+    initDefaultChannels();
+
+    const gatePassed = sessionStorage.getItem('gatePassword');
+    if (gatePassed === 'true') setIsGatePassed(true);
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleGateSuccess = (firebaseUser) => {
+    setUser(firebaseUser);
+    setIsGatePassed(true);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setIsGatePassed(false);
+    sessionStorage.removeItem('gatePassword');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="loading-screen">
+        <div className="zigot-logo-loading">
+          <div className="logo-icon">🥚</div>
+          <div className="logo-text">Zigotlar</div>
+        </div>
+        <div className="spinner"></div>
+      </div>
+    );
+  }
+
+  if (!isGatePassed || !user) {
+    return <Gate onLoginSuccess={handleGateSuccess} />;
+  }
+
+  return <MainApp user={user} onLogout={handleLogout} />;
+}
+
+export default App;
+    import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
+import { getStorage } from "firebase/storage";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCRwjHITrbz8Ol5X73Ec99EpizoAXG-2gI",
+  authDomain: "zigotlar-dcca6.firebaseapp.com",
+  databaseURL: "https://zigotlar-dcca6-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "zigotlar-dcca6",
+  storageBucket: "zigotlar-dcca6.firebasestorage.app",
+  messagingSenderId: "769226999831",
+  appId: "1:769226999831:web:8b1e1eae8d94414ebcb452"
+};
+
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const rtdb = getDatabase(app);
+export const storage = getStorage(app);
+export const GATE_PASSWORD = "ruhi123";
+    import { auth } from './config';
+import { signInAnonymously, signOut } from 'firebase/auth';
+
+export const anonymousLogin = async () => {
+  try {
+    const userCredential = await signInAnonymously(auth);
+    return { success: true, user: userCredential.user };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const logoutUser = async () => {
+  try {
+    await signOut(auth);
+    sessionStorage.removeItem('gatePassword');
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+    import { rtdb } from './config';
+import { ref, set, push, onValue, off, update, remove, get } from 'firebase/database';
+
+export const DEFAULT_CHANNELS = [
+  { id: 'genel', name: 'genel', type: 'text', topic: 'Hoş geldiniz Zigotlar! 🎉', isDefault: true, createdAt: Date.now() },
+  { id: 'oyun', name: 'oyun', type: 'text', topic: 'Oyun sohbetleri 🎮', isDefault: true, createdAt: Date.now() },
+  { id: 'müzik', name: 'müzik', type: 'text', topic: 'Müzik paylaşımları 🎵', isDefault: true, createdAt: Date.now() },
+  { id: 'duyurular', name: 'duyurular', type: 'text', topic: 'Önemli duyurular 📢', isDefault: true, createdAt: Date.now() },
+  { id: 'meme', name: 'meme', type: 'text', topic: 'Meme ve eğlence 😂', isDefault: true, createdAt: Date.now() },
+  { id: 'şehir', name: 'şehir', type: 'text', topic: 'Şehir sohbetleri 🏙️', isDefault: true, createdAt: Date.now() }
+];
+
+export const initDefaultChannels = async () => {
+  for (const channel of DEFAULT_CHANNELS) {
+    const channelRef = ref(rtdb, `channels/${channel.id}`);
+    const snapshot = await get(channelRef);
+    if (!snapshot.exists()) await set(channelRef, channel);
+  }
+};
+
+export const getChannels = (callback) => {
+  const channelsRef = ref(rtdb, 'channels');
+  onValue(channelsRef, (snapshot) => {
+    const data = snapshot.val();
+    callback(data ? Object.values(data) : []);
+  });
+  return () => off(channelsRef);
+};
+
+export const createChannel = async (channelData) => {
+  const channelId = channelData.name.toLowerCase().replace(/\s/g, '-');
+  const channelRef = ref(rtdb, `channels/${channelId}`);
+  const newChannel = { id: channelId, name: channelData.name, type: channelData.type || 'text', topic: channelData.topic || '', isDefault: false, createdAt: Date.now(), createdBy: channelData.createdBy };
+  await set(channelRef, newChannel);
+  return newChannel;
+};
+
+export const updateChannelTopic = async (channelId, topic) => {
+  await set(ref(rtdb, `channels/${channelId}/topic`), topic);
+};
+
+export const deleteChannel = async (channelId) => {
+  await remove(ref(rtdb, `channels/${channelId}`));
+};
+
+export const sendMessage = async (channelId, messageData) => {
+  const messagesRef = ref(rtdb, `messages/${channelId}`);
+  const newMessageRef = push(messagesRef);
+  const messageWithId = { ...messageData, id: newMessageRef.key, timestamp: Date.now(), edited: false, deleted: false, pinned: false, reactions: {} };
+  await set(newMessageRef, messageWithId);
+  return newMessageRef.key;
+};
+
+export const getMessages = (channelId, callback) => {
+  const messagesRef = ref(rtdb, `messages/${channelId}`);
+  onValue(messagesRef, (snapshot) => {
+    const data = snapshot.val();
+    callback(data ? Object.values(data).sort((a, b) => a.timestamp - b.timestamp) : []);
+  });
+  return () => off(messagesRef);
+};
+
+export const updateMessage = async (channelId, messageId, updates) => {
+  await update(ref(rtdb, `messages/${channelId}/${messageId}`), updates);
+};
+
+export const deleteMessage = async (channelId, messageId) => {
+  await update(ref(rtdb, `messages/${channelId}/${messageId}`), { deleted: true, content: '🗑️ Bu mesaj silindi' });
+};
+
+export const pinMessage = async (channelId, messageId, isPinned) => {
+  await update(ref(rtdb, `messages/${channelId}/${messageId}`), { pinned: isPinned });
+};
+
+export const addReaction = async (channelId, messageId, userId, emoji) => {
+  const reactionRef = ref(rtdb, `messages/${channelId}/${messageId}/reactions/${emoji}`);
+  const snapshot = await get(reactionRef);
+  const users = snapshot.val() || [];
+  if (!users.includes(userId)) await set(reactionRef, [...users, userId]);
+};
+
+export const removeReaction = async (channelId, messageId, userId, emoji) => {
+  const reactionRef = ref(rtdb, `messages/${channelId}/${messageId}/reactions/${emoji}`);
+  const snapshot = await get(reactionRef);
+  const users = snapshot.val() || [];
+  const newUsers = users.filter(id => id !== userId);
+  if (newUsers.length === 0) await remove(reactionRef);
+  else await set(reactionRef, newUsers);
+};
+
+export const updateUserStatus = async (userId, userName, status, customStatus = '', photo = null) => {
+  await set(ref(rtdb, `users/${userId}`), { id: userId, name: userName, photo: photo, status: { status: status, customStatus: customStatus, lastSeen: Date.now() }, lastActive: Date.now() });
+};
+
+export const getUserTyping = (channelId, callback) => {
+  const typingRef = ref(rtdb, `typing/${channelId}`);
+  onValue(typingRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      const now = Date.now();
+      Object.keys(data).forEach(key => { if (now - data[key].timestamp > 5000) remove(ref(rtdb, `typing/${channelId}/${key}`)); });
+    }
+    callback(data || {});
+  });
+  return () => off(typingRef);
+};
+
+export const setUserTyping = async (channelId, userId, userName, isTyping) => {
+  const typingRef = ref(rtdb, `typing/${channelId}/${userId}`);
+  if (isTyping) await set(typingRef, { userId, userName, timestamp: Date.now() });
+  else await remove(typingRef);
+};
+
+export const blockUser = async (userId, blockedUserId) => {
+  await set(ref(rtdb, `blocks/${userId}/${blockedUserId}`), { blockedAt: Date.now() });
+};
+
+export const unblockUser = async (userId, blockedUserId) => {
+  await remove(ref(rtdb, `blocks/${userId}/${blockedUserId}`));
+};
+
+export const isUserBlocked = async (userId, targetUserId) => {
+  const snapshot = await get(ref(rtdb, `blocks/${userId}/${targetUserId}`));
+  return snapshot.exists();
+};
+    import React, { useState, useRef, useEffect } from 'react';
+import styles from './Gate.module.css';
+import { GATE_PASSWORD } from '../../firebase/config';
+import { anonymousLogin } from '../../firebase/auth';
+
+const Gate = ({ onLoginSuccess }) => {
+  const [password, setPassword] = useState('');
+  const [userName, setUserName] = useState('');
+  const [showNameInput, setShowNameInput] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [shake, setShake] = useState(false);
+  
+  const inputRef = useRef(null);
+  const nameInputRef = useRef(null);
+  
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+  
+  useEffect(() => {
+    if (showNameInput) nameInputRef.current?.focus();
+  }, [showNameInput]);
+  
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (password === GATE_PASSWORD) {
+      setShowNameInput(true);
+      setError('');
+    } else {
+      setShake(true);
+      setError('Hatalı şifre!');
+      setPassword('');
+      setTimeout(() => setShake(false), 500);
+    }
+  };
+  
+  const handleNameSubmit = async (e) => {
+    e.preventDefault();
+    if (!userName.trim()) {
+      setError('Lütfen adınızı girin!');
+      return;
+    }
+    setIsLoading(true);
+    const result = await anonymousLogin();
+    if (result.success) {
+      localStorage.setItem('userName', userName.trim());
+      localStorage.setItem('userId', result.user.uid);
+      sessionStorage.setItem('gatePassword', 'true');
+      onLoginSuccess(result.user);
+    } else {
+      setError('Giriş hatası: ' + result.error);
+      setIsLoading(false);
+    }
+  };
+  
+  return (
+    <div className={styles.gateContainer}>
+      <div className={styles.gateCard}>
+        <div className={styles.lockIcon}>🔒</div>
+        <h1>Zigotlar</h1>
+        {!showNameInput ? (
+          <form onSubmit={handlePasswordSubmit} className={styles.form}>
+            <div className={styles.inputGroup}>
+              <label>Kapı Şifresi</label>
+              <input ref={inputRef} type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={`${styles.input} ${shake ? styles.shake : ''}`} placeholder="Şifreyi girin..." autoComplete="off" />
+            </div>
+            {error && <div className={styles.error}>{error}</div>}
+            <button type="submit" className={styles.button}>Giriş Yap</button>
+            <div className={styles.hint}>🔑 Şifre: ruhi123</div>
+          </form>
+        ) : (
+          <form onSubmit={handleNameSubmit} className={styles.form}>
+            <div className={styles.inputGroup}>
+              <label>Adınız</label>
+              <input ref={nameInputRef} type="text" value={userName} onChange={(e) => setUserName(e.target.value)} className={styles.input} placeholder="Adınızı girin..." maxLength={30} autoComplete="off" />
+            </div>
+            {error && <div className={styles.error}>{error}</div>}
+            <button type="submit" className={styles.button} disabled={isLoading}>{isLoading ? 'Giriş yapılıyor...' : 'Devam Et →'}</button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Gate;
+    .gateContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #0a0e1a 0%, #151b2b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.gateCard {
+  background: rgba(15, 20, 32, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  animation: slideUp 0.5s ease-out;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.lockIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.gateCard h1 {
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 32px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inputGroup {
+  text-align: left;
+}
+
+.inputGroup label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #8a9bb5;
+  margin-bottom: 8px;
+}
+
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  border: 2px solid #1e2a3a;
+  border-radius: 12px;
+  transition: all 0.2s;
+  outline: none;
+  background: #0f1420;
+  color: #e8f0fe;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.error {
+  color: #ef4444;
+  font-size: 14px;
+  margin-top: -8px;
+  text-align: center;
+}
+
+.button {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.hint {
+  font-size: 12px;
+  color: #5a6e8a;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #1e2a3a;
+}
+    import React, { useState } from 'react';
+import Sidebar from '../Sidebar/Sidebar';
+import ChatArea from '../Chat/ChatArea';
+import FriendsList from '../Friends/FriendsList';
+import styles from './MainApp.module.css';
+
+const MainApp = ({ user, onLogout }) => {
+  const [currentChannel, setCurrentChannel] = useState(null);
+  const [currentDM, setCurrentDM] = useState(null);
+  const [currentGroup, setCurrentGroup] = useState(null);
+  const [showFriends, setShowFriends] = useState(true);
+
+  const handleChannelSelect = (channel) => {
+    setCurrentChannel(channel);
+    setCurrentDM(null);
+    setCurrentGroup(null);
+    setShowFriends(false);
+  };
+
+  const handleDMSelect = (dm) => {
+    setCurrentDM(dm);
+    setCurrentChannel(null);
+    setCurrentGroup(null);
+    setShowFriends(false);
+  };
+
+  const handleGroupSelect = (group) => {
+    setCurrentGroup(group);
+    setCurrentChannel(null);
+    setCurrentDM(null);
+    setShowFriends(false);
+  };
+
+  const handleShowFriends = () => {
+    setShowFriends(true);
+    setCurrentChannel(null);
+    setCurrentDM(null);
+    setCurrentGroup(null);
+  };
+
+  return (
+    <div className={styles.mainApp}>
+      <Sidebar 
+        currentUser={user}
+        currentChannel={currentChannel}
+        onChannelSelect={handleChannelSelect}
+        onDMSelect={handleDMSelect}
+        onGroupSelect={handleGroupSelect}
+        onShowFriends={handleShowFriends}
+        onLogout={onLogout}
+      />
+      <div className={styles.contentArea}>
+        {showFriends ? (
+          <FriendsList currentUser={user} onDMSelect={handleDMSelect} />
+        ) : currentChannel ? (
+          <ChatArea type="channel" data={currentChannel} currentUser={user} />
+        ) : currentDM ? (
+          <ChatArea type="dm" data={currentDM} currentUser={user} />
+        ) : currentGroup ? (
+          <ChatArea type="group" data={currentGroup} currentUser={user} />
+        ) : (
+          <FriendsList currentUser={user} onDMSelect={handleDMSelect} />
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default MainApp;
+            .mainApp {
+  display: flex;
+  height: 100vh;
+  background: var(--bg-primary);
+}
+
+.contentArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+            import React, { useState } from 'react';
+import ZigotLogo from '../Logo/ZigotLogo';
+import ChannelList from './ChannelList';
+import DMList from './DMList';
+import GroupList from './GroupList';
+import CreateChannelModal from '../Modals/CreateChannelModal';
+import { logoutUser } from '../../firebase/auth';
+import styles from './Sidebar.module.css';
+
+const Sidebar = ({ currentUser, currentChannel, onChannelSelect, onDMSelect, onGroupSelect, onShowFriends, onLogout }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('channels');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const userName = localStorage.getItem('userName') || 'Kullanıcı';
+  const userPhoto = localStorage.getItem('userPhoto') || null;
+
+  const handleLogout = async () => {
+    await logoutUser();
+    onLogout();
+  };
+
+  return (
+    <>
+      <div className={`${styles.sidebar} ${isMobileMenuOpen ? styles.mobileOpen : ''}`}>
+        <div className={styles.logoArea}>
+          <ZigotLogo variant="default" />
+          <button className={styles.mobileToggle} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>☰</button>
+        </div>
+
+        <div className={styles.userSection}>
+          <div className={styles.userAvatar}>
+            {userPhoto ? <img src={userPhoto} alt={userName} /> : <div className={styles.avatarPlaceholder}>{userName.charAt(0).toUpperCase()}</div>}
+          </div>
+          <div className={styles.userInfo}>
+            <div className={styles.userName}>{userName}</div>
+            <div className={styles.userStatus}><span className={styles.statusIndicator}></span>Çevrimiçi</div>
+          </div>
+          <button className={styles.friendsBtn} onClick={onShowFriends} title="Arkadaşlar">👥</button>
+          <button className={styles.logoutBtn} onClick={handleLogout} title="Çıkış">🚪</button>
+        </div>
+
+        <div className={styles.tabNav}>
+          <button className={`${styles.tabBtn} ${activeTab === 'channels' ? styles.active : ''}`} onClick={() => setActiveTab('channels')}>📢 Kanallar</button>
+          <button className={`${styles.tabBtn} ${activeTab === 'dms' ? styles.active : ''}`} onClick={() => setActiveTab('dms')}>💬 DM</button>
+          <button className={`${styles.tabBtn} ${activeTab === 'groups' ? styles.active : ''}`} onClick={() => setActiveTab('groups')}>👥 Gruplar</button>
+        </div>
+
+        <div className={styles.contentArea}>
+          {activeTab === 'channels' && <ChannelList currentChannel={currentChannel} onChannelSelect={onChannelSelect} onCreateChannel={() => setIsModalOpen(true)} />}
+          {activeTab === 'dms' && <DMList currentUser={currentUser} onDMSelect={onDMSelect} />}
+          {activeTab === 'groups' && <GroupList currentUser={currentUser} onGroupSelect={onGroupSelect} />}
+        </div>
+      </div>
+      <CreateChannelModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} currentUser={currentUser} />
+    </>
+  );
+};
+
+export default Sidebar;
+        .sidebar {
+  width: 280px;
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-color);
+  height: 100vh;
+  transition: transform 0.3s ease;
+}
+
+.logoArea {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.userSection {
+  padding: 12px 16px;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.userAvatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatarPlaceholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; color: white; background: var(--accent-primary); }
+.userInfo { flex: 1; }
+.userName { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.userStatus { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+.statusIndicator { width: 8px; height: 8px; background: var(--online); border-radius: 50%; display: inline-block; }
+.friendsBtn, .logoutBtn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 6px; border-radius: 8px; transition: background 0.2s; color: var(--text-secondary); }
+.friendsBtn:hover, .logoutBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.mobileToggle { display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); padding: 4px 8px; border-radius: 8px; }
+.mobileToggle:hover { background: var(--bg-hover); }
+
+.tabNav { display: flex; padding: 12px; gap: 4px; border-bottom: 1px solid var(--border-color); }
+.tabBtn { flex: 1; padding: 8px; background: none; border: none; border-radius: 8px; color: var(--text-secondary); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.tabBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.tabBtn.active { background: var(--bg-active); color: var(--text-primary); }
+
+.contentArea { flex: 1; overflow-y: auto; padding: 8px 0; }
+.channelList, .dmList, .groupList { padding: 0 8px; }
+.sectionHeader { display: flex; justify-content: space-between; align-items: center; padding: 12px 8px 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.addBtn { background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; padding: 0 4px; border-radius: 4px; }
+.addBtn:hover { color: var(--text-primary); background: var(--bg-hover); }
+.channelItem, .dmItem, .groupItem { display: flex; align-items: center; justify-content: space-between; padding: 8px; margin: 2px 0; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+.channelItem:hover, .dmItem:hover, .groupItem:hover { background: var(--bg-hover); }
+.channelItem.active, .dmItem.active, .groupItem.active { background: var(--bg-active); }
+.channelInfo, .dmInfo, .groupInfo { display: flex; align-items: center; gap: 8px; flex: 1; }
+.channelIcon { font-size: 16px; width: 24px; }
+.channelName, .dmName, .groupName { font-size: 14px; color: var(--text-primary); }
+.channelActions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; }
+.channelItem:hover .channelActions { opacity: 1; }
+.actionBtn { background: none; border: none; font-size: 14px; cursor: pointer; padding: 4px; border-radius: 4px; }
+.actionBtn:hover { background: var(--bg-secondary); }
+
+.dmAvatar, .groupAvatar { position: relative; width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: var(--accent-primary); display: flex; align-items: center; justify-content: center; }
+.avatarSmall { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: white; }
+.statusDot { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--bg-secondary); }
+.statusDot.online { background: var(--online); }
+.statusDot.away { background: var(--away); }
+.statusDot.dnd { background: var(--dnd); }
+.unreadBadge { background: var(--accent-primary); color: white; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 12px; min-width: 20px; text-align: center; }
+
+@media (max-width: 768px) {
+  .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); z-index: 1000; }
+  .sidebar.mobileOpen { transform: translateX(0); }
+  .mobileToggle { display: block; }
+}
+        import React from 'react';
+import styles from './ZigotLogo.module.css';
+
+const ZigotLogo = ({ variant = 'default' }) => {
+  return (
+    <div className={`${styles.logo} ${styles[variant]}`}>
+      <div className={styles.logoIcon}>
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="14" fill="#3b82f6" stroke="#60a5fa" strokeWidth="2"/>
+          <path d="M16 8 L16 24 M8 16 L24 16" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+          <circle cx="16" cy="16" r="4" fill="white"/>
+          <circle cx="16" cy="12" r="1.5" fill="#3b82f6"/>
+          <circle cx="20" cy="16" r="1.5" fill="#3b82f6"/>
+          <circle cx="16" cy="20" r="1.5" fill="#3b82f6"/>
+          <circle cx="12" cy="16" r="1.5" fill="#3b82f6"/>
+        </svg>
+      </div>
+      <div className={styles.logoText}>
+        <span className={styles.zigot}>Zigotlar</span>
+        <span className={styles.beta}>beta</span>
+      </div>
+    </div>
+  );
+};
+
+export default ZigotLogo;
+        .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.zigot {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.beta {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+        import React, { useState, useEffect } from 'react';
+import { getChannels, updateChannelTopic, deleteChannel } from '../../firebase/realtime';
+import styles from './Sidebar.module.css';
+
+const ChannelList = ({ currentChannel, onChannelSelect, onCreateChannel }) => {
+  const [channels, setChannels] = useState([]);
+  const [mutedChannels, setMutedChannels] = useState(() => {
+    const saved = localStorage.getItem('mutedChannels');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [editingChannel, setEditingChannel] = useState(null);
+  const [editTopic, setEditTopic] = useState('');
+
+  useEffect(() => {
+    const unsubscribe = getChannels((loadedChannels) => setChannels(loadedChannels));
+    return () => unsubscribe();
+  }, []);
+
+  const toggleMute = (channelId, e) => {
+    e.stopPropagation();
+    let newMuted;
+    if (mutedChannels.includes(channelId)) {
+      newMuted = mutedChannels.filter(id => id !== channelId);
+    } else {
+      newMuted = [...mutedChannels, channelId];
+    }
+    setMutedChannels(newMuted);
+    localStorage.setItem('mutedChannels', JSON.stringify(newMuted));
+  };
+
+  const handleTopicEdit = (channel, e) => {
+    e.stopPropagation();
+    setEditingChannel(channel.id);
+    setEditTopic(channel.topic || '');
+  };
+
+  const saveTopic = async (channelId) => {
+    await updateChannelTopic(channelId, editTopic);
+    setEditingChannel(null);
+  };
+
+  const handleDeleteChannel = async (channelId, e) => {
+    e.stopPropagation();
+    if (window.confirm('Bu kanalı silmek istediğinize emin misiniz?')) {
+      await deleteChannel(channelId);
+    }
+  };
+
+  const getChannelIcon = (channelName) => {
+    const icons = { genel: '💬', oyun: '🎮', müzik: '🎵', duyurular: '📢', meme: '😂', şehir: '🏙️' };
+    return icons[channelName.toLowerCase()] || '#️⃣';
+  };
+
+  return (
+    <div className={styles.channelList}>
+      <div className={styles.sectionHeader}>
+        <span>METİN KANALLARI</span>
+        <button onClick={onCreateChannel} className={styles.addBtn}>+</button>
+      </div>
+      {channels.map(channel => (
+        <div key={channel.id} className={`${styles.channelItem} ${currentChannel?.id === channel.id ? styles.active : ''}`} onClick={() => onChannelSelect(channel)}>
+          <div className={styles.channelInfo}>
+            <span className={styles.channelIcon}>{getChannelIcon(channel.name)}</span>
+            <span className={styles.channelName}># {channel.name}</span>
+            {mutedChannels.includes(channel.id) && <span className={styles.mutedIcon}>🔇</span>}
+          </div>
+          <div className={styles.channelActions}>
+            <button onClick={(e) => toggleMute(channel.id, e)} className={styles.actionBtn} title={mutedChannels.includes(channel.id) ? 'Sesi aç' : 'Sustur'}>
+              {mutedChannels.includes(channel.id) ? '🔇' : '🔔'}
+            </button>
+            {!channel.isDefault && (
+              <button onClick={(e) => handleDeleteChannel(channel.id, e)} className={styles.actionBtn} title="Kanalı sil">🗑️</button>
+            )}
+          </div>
+        </div>
+      ))}
+      {editingChannel && (
+        <div className={styles.topicEditor}>
+          <input type="text" value={editTopic} onChange={(e) => setEditTopic(e.target.value)} placeholder="Kanal konusu..." onKeyPress={(e) => e.key === 'Enter' && saveTopic(editingChannel)} autoFocus />
+          <button onClick={() => saveTopic(editingChannel)}>✓</button>
+          <button onClick={() => setEditingChannel(null)}>✗</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ChannelList;
+      import React, { useState, useEffect } from 'react';
+import { rtdb } from '../../firebase/config';
+import { ref, onValue } from 'firebase/database';
+import styles from './Sidebar.module.css';
+
+const DMList = ({ currentUser, onDMSelect }) => {
+  const [dms, setDMs] = useState([]);
+  const [users, setUsers] = useState({});
+
+  useEffect(() => {
+    const usersRef = ref(rtdb, 'users');
+    const unsubscribeUsers = onValue(usersRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) setUsers(data);
+    });
+
+    const dmsRef = ref(rtdb, 'dms');
+    const unsubscribeDMs = onValue(dmsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const userDMs = Object.values(data).filter(dm => dm.participants?.includes(currentUser?.uid));
+        setDMs(userDMs);
+      }
+    });
+
+    return () => {
+      unsubscribeUsers();
+      unsubscribeDMs();
+    };
+  }, [currentUser]);
+
+  const getOtherUser = (dm) => {
+    const otherUserId = dm.participants?.find(id => id !== currentUser?.uid);
+    const userData = users[otherUserId];
+    return { id: otherUserId, name: userData?.name || 'Kullanıcı', photo: userData?.photo, status: userData?.status?.status || 'offline' };
+  };
+
+  const getStatusIcon = (status) => {
+    switch(status) {
+      case 'online': return '🟢';
+      case 'away': return '🟡';
+      case 'dnd': return '🔴';
+      default: return '⚫';
+    }
+  };
+
+  return (
+    <div className={styles.dmList}>
+      <div className={styles.sectionHeader}>
+        <span>DOĞRUDAN MESAJLAR</span>
+      </div>
+      {dms.map(dm => {
+        const otherUser = getOtherUser(dm);
+        return (
+          <div key={dm.id} className={styles.dmItem} onClick={() => onDMSelect(otherUser)}>
+            <div className={styles.dmAvatar}>
+              {otherUser.photo ? <img src={otherUser.photo} alt={otherUser.name} /> : <div className={styles.avatarSmall}>{otherUser.name.charAt(0).toUpperCase()}</div>}
+              <span className={`${styles.statusDot} ${styles[otherUser.status]}`} />
+            </div>
+            <div className={styles.dmInfo}>
+              <div className={styles.dmName}>{otherUser.name} <span className={styles.statusIcon}>{getStatusIcon(otherUser.status)}</span></div>
+              <div className={styles.dmPreview}>{dm.lastMessage?.content || 'Henüz mesaj yok'}</div>
+            </div>
+            {dm.unreadCount > 0 && <div className={styles.unreadBadge}>{dm.unreadCount}</div>}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default DMList;
+        import React, { useState, useEffect } from 'react';
+import { rtdb } from '../../firebase/config';
+import { ref, onValue } from 'firebase/database';
+import styles from './Sidebar.module.css';
+
+const GroupList = ({ currentUser, onGroupSelect }) => {
+  const [groups, setGroups] = useState([]);
+
+  useEffect(() => {
+    const groupsRef = ref(rtdb, 'groups');
+    const unsubscribe = onValue(groupsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const userGroups = Object.values(data).filter(group => group.members?.includes(currentUser?.uid));
+        setGroups(userGroups);
+      }
+    });
+    return () => unsubscribe();
+  }, [currentUser]);
+
+  return (
+    <div className={styles.groupList}>
+      <div className={styles.sectionHeader}>
+        <span>GRUPLAR</span>
+        <button className={styles.addBtn}>+</button>
+      </div>
+      {groups.map(group => (
+        <div key={group.id} className={styles.groupItem} onClick={() => onGroupSelect(group)}>
+          <div className={styles.groupAvatar}>
+            {group.photo ? <img src={group.photo} alt={group.name} /> : <div className={styles.avatarSmall}>{group.name.charAt(0).toUpperCase()}</div>}
+          </div>
+          <div className={styles.groupInfo}>
+            <div className={styles.groupName}>{group.name}</div>
+            <div className={styles.groupMembers}>{group.members?.length} üye</div>
+          </div>
+          {group.unreadCount > 0 && <div className={styles.unreadBadge}>{group.unreadCount}</div>}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default GroupList;
+        import React, { useState } from 'react';
+import { createChannel } from '../../firebase/realtime';
+import styles from './Modal.module.css';
+
+const CreateChannelModal = ({ isOpen, onClose, currentUser }) => {
+  const [channelName, setChannelName] = useState('');
+  const [channelType, setChannelType] = useState('text');
+  const [channelTopic, setChannelTopic] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!channelName.trim()) {
+      setError('Kanal adı gerekli');
+      return;
+    }
+    setIsLoading(true);
+    setError('');
+    try {
+      await createChannel({ name: channelName.trim(), type: channelType, topic: channelTopic, createdBy: currentUser?.uid });
+      setChannelName('');
+      setChannelTopic('');
+      onClose();
+    } catch (err) {
+      setError('Kanal oluşturulamadı: ' + err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <h2>Kanal Oluştur</h2>
+          <button onClick={onClose} className={styles.closeBtn}>✕</button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className={styles.formGroup}>
+            <label>Kanal Adı</label>
+            <input type="text" value={channelName} onChange={(e) => setChannelName(e.target.value)} placeholder="örnek: yeni-kanal" autoFocus />
+          </div>
+          <div className={styles.formGroup}>
+            <label>Kanal Tipi</label>
+            <select value={channelType} onChange={(e) => setChannelType(e.target.value)}>
+              <option value="text">💬 Metin Kanalı</option>
+              <option value="voice">🎙️ Sesli Kanal</option>
+              <option value="forum">📝 Forum Kanalı</option>
+            </select>
+          </div>
+          <div className={styles.formGroup}>
+            <label>Kanal Konusu (opsiyonel)</label>
+            <input type="text" value={channelTopic} onChange={(e) => setChannelTopic(e.target.value)} placeholder="Bu kanal ne hakkında?" />
+          </div>
+          {error && <div className={styles.error}>{error}</div>}
+          <div className={styles.modalFooter}>
+            <button type="button" onClick={onClose} className={styles.cancelBtn}>İptal</button>
+            <button type="submit" disabled={isLoading} className={styles.createBtn}>{isLoading ? 'Oluşturuluyor...' : 'Oluştur'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default CreateChannelModal;
+        .modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modalHeader h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.closeBtn:hover { color: var(--text-primary); }
+
+.modal form { padding: 24px; }
+
+.formGroup { margin-bottom: 20px; }
+
+.formGroup label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.cancelBtn, .createBtn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelBtn {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.cancelBtn:hover { background: var(--bg-hover); }
+
+.createBtn {
+  background: var(--accent-primary);
+  border: none;
+  color: white;
+}
+
+.createBtn:hover { background: var(--accent-secondary); transform: translateY(-1px); }
+.createBtn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.error {
+  background: var(--accent-danger);
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 16px;
+}
+        import React, { useState, useEffect } from 'react';
+import { rtdb } from '../../firebase/config';
+import { ref, onValue, set, remove } from 'firebase/database';
+import styles from './FriendsList.module.css';
+
+const FriendsList = ({ currentUser, onDMSelect }) => {
+  const [friends, setFriends] = useState([]);
+  const [onlineFriends, setOnlineFriends] = useState([]);
+  const [activeTab, setActiveTab] = useState('online');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [addFriendInput, setAddFriendInput] = useState('');
+  const [showAddFriend, setShowAddFriend] = useState(false);
+  const [users, setUsers] = useState({});
+
+  useEffect(() => {
+    const usersRef = ref(rtdb, 'users');
+    const unsubscribeUsers = onValue(usersRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) setUsers(data);
+    });
+
+    const friendsRef = ref(rtdb, `friends/${currentUser?.uid}`);
+    const unsubscribeFriends = onValue(friendsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const friendsList = Object.values(data);
+        setFriends(friendsList);
+        const online = friendsList.filter(friend => users[friend.userId]?.status?.status === 'online');
+        setOnlineFriends(online);
+      } else {
+        setFriends([]);
+        setOnlineFriends([]);
+      }
+    });
+
+    return () => {
+      unsubscribeUsers();
+      unsubscribeFriends();
+    };
+  }, [currentUser]);
+
+  const sendFriendRequest = async () => {
+    if (!addFriendInput.trim()) return;
+    const targetUser = Object.values(users).find(u => u.name?.toLowerCase() === addFriendInput.toLowerCase());
+    if (!targetUser) {
+      alert('Kullanıcı bulunamadı!');
+      return;
+    }
+    const requestRef = ref(rtdb, `friendRequests/${targetUser.id}/${currentUser.uid}`);
+    await set(requestRef, {
+      fromUserId: currentUser.uid,
+      fromUserName: localStorage.getItem('userName'),
+      timestamp: Date.now(),
+      status: 'pending'
+    });
+    setAddFriendInput('');
+    setShowAddFriend(false);
+    alert('Arkadaşlık isteği gönderildi!');
+  };
+
+  const getStatusIcon = (status) => {
+    switch(status) {
+      case 'online': return '🟢';
+      case 'away': return '🟡';
+      case 'dnd': return '🔴';
+      default: return '⚫';
+    }
+  };
+
+  const getActivityText = (friend) => {
+    const user = users[friend.userId];
+    const status = user?.status?.status;
+    const activity = user?.activity;
+    if (activity?.type === 'spotify') return `🎵 Spotify'da ${activity.track} dinliyor`;
+    if (activity?.type === 'game') return `🎮 ${activity.game} oynuyor`;
+    if (status === 'online') return 'Çevrimiçi';
+    if (status === 'away') return 'Boşta';
+    if (status === 'dnd') return 'Rahatsız Etmeyin';
+    return user?.status?.customStatus || 'Çevrimdışı';
+  };
+
+  const filteredFriends = () => {
+    let list = activeTab === 'online' ? onlineFriends : friends;
+    if (searchTerm) list = list.filter(f => f.userName?.toLowerCase().includes(searchTerm.toLowerCase()));
+    return list;
+  };
+
+  return (
+    <div className={styles.friendsContainer}>
+      <div className={styles.header}>
+        <div className={styles.headerLeft}>
+          <h1>Arkadaşlar</h1>
+          <div className={styles.tabs}>
+            <button className={`${styles.tab} ${activeTab === 'online' ? styles.active : ''}`} onClick={() => setActiveTab('online')}>Çevrimiçi <span className={styles.count}>{onlineFriends.length}</span></button>
+            <button className={`${styles.tab} ${activeTab === 'all' ? styles.active : ''}`} onClick={() => setActiveTab('all')}>Tümü <span className={styles.count}>{friends.length}</span></button>
+          </div>
+        </div>
+        <button className={styles.addFriendBtn} onClick={() => setShowAddFriend(!showAddFriend)}>+ Arkadaş Ekle</button>
+      </div>
+
+      {showAddFriend && (
+        <div className={styles.addFriendBox}>
+          <input type="text" value={addFriendInput} onChange={(e) => setAddFriendInput(e.target.value)} placeholder="Kullanıcı adı gir..." onKeyPress={(e) => e.key === 'Enter' && sendFriendRequest()} />
+          <button onClick={sendFriendRequest}>Ekle</button>
+        </div>
+      )}
+
+      <div className={styles.searchBox}>
+        <input type="text" placeholder="Arkadaşlarında ara..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+      </div>
+
+      <div className={styles.friendsList}>
+        {filteredFriends().length === 0 ? (
+          <div className={styles.emptyState}>
+            <div className={styles.emptyIcon}>👥</div>
+            <h3>Henüz arkadaşın yok</h3>
+            <p>Arkadaş ekleyerek sohbete başlayabilirsin!</p>
+            <button onClick={() => setShowAddFriend(true)}>Arkadaş Ekle</button>
+          </div>
+        ) : (
+          filteredFriends().map(friend => {
+            const user = users[friend.userId];
+            return (
+              <div key={friend.userId} className={styles.friendItem}>
+                <div className={styles.friendAvatar}>
+                  {user?.photo ? <img src={user.photo} alt={friend.userName} /> : <div className={styles.avatarPlaceholder}>{friend.userName?.charAt(0).toUpperCase()}</div>}
+                  <span className={`${styles.statusDot} ${styles[user?.status?.status || 'offline']}`} />
+                </div>
+                <div className={styles.friendInfo}>
+                  <div className={styles.friendName}>{friend.userName} {user?.status?.status === 'online' && <span className={styles.onlineBadge}>Çevrimiçi</span>}</div>
+                  <div className={styles.friendActivity}>{getActivityText(friend)}</div>
+                </div>
+                <div className={styles.friendActions}>
+                  <button className={styles.messageBtn} onClick={() => onDMSelect({ userId: friend.userId, userName: friend.userName })} title="Mesaj gönder">💬</button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {activeTab === 'online' && onlineFriends.length > 0 && (
+        <div className={styles.activeSection}>
+          <div className={styles.sectionHeader}>🎮 ŞİMDİ AKTİF</div>
+          {onlineFriends.slice(0, 5).map(friend => {
+            const user = users[friend.userId];
+            return (
+              <div key={friend.userId} className={styles.activeItem}>
+                <div className={styles.activeAvatar}>
+                  {user?.photo ? <img src={user.photo} alt={friend.userName} /> : <div className={styles.avatarSmall}>{friend.userName?.charAt(0).toUpperCase()}</div>}
+                </div>
+                <div className={styles.activeInfo}>
+                  <div className={styles.activeName}>{friend.userName}</div>
+                  <div className={styles.activeDetail}>{user?.activity?.game || 'Çevrimiçi'}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default FriendsList;
+        .friendsContainer {
+  flex: 1;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerLeft h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.tabs { display: flex; gap: 16px; }
+.tab {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: color 0.2s;
+  position: relative;
+}
+.tab:hover { color: var(--text-primary); }
+.tab.active { color: var(--text-primary); }
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-primary);
+  border-radius: 2px;
+}
+.count {
+  margin-left: 6px;
+  background: var(--bg-tertiary);
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+.addFriendBtn {
+  background: var(--accent-primary);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.addFriendBtn:hover { background: var(--accent-secondary); }
+.addFriendBox {
+  margin: 16px 24px;
+  display: flex;
+  gap: 12px;
+}
+.addFriendBox input {
+  flex: 1;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+.addFriendBox input:focus { outline: none; border-color: var(--accent-primary); }
+.addFriendBox button {
+  background: var(--accent-primary);
+  border: none;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.searchBox { padding: 0 24px 16px; }
+.searchBox input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+.friendsList { flex: 1; padding: 0 16px 16px; }
+.friendItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin: 4px 0;
+  border-radius: 10px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.friendItem:hover { background: var(--bg-tertiary); }
+.friendAvatar {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.friendAvatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatarPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  background: var(--accent-primary);
+}
+.statusDot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 3px solid var(--bg-primary);
+}
+.statusDot.online { background: var(--online); }
+.statusDot.away { background: var(--away); }
+.statusDot.dnd { background: var(--dnd); }
+.friendInfo { flex: 1; min-width: 0; }
+.friendName {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.onlineBadge {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--online);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 2px 6px;
+  border-radius: 12px;
+}
+.friendActivity {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.friendActions {
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.friendItem:hover .friendActions { opacity: 1; }
+.messageBtn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+}
+.messageBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.activeSection {
+  margin-top: 24px;
+  padding: 16px 24px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+}
+.sectionHeader {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.activeItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.activeItem:hover { background: var(--bg-tertiary); padding: 10px 12px; margin: 0 -12px; }
+.activeAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatarSmall {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+.activeInfo { flex: 1; }
+.activeName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.activeDetail {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.emptyState {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--text-muted);
+}
+.emptyIcon { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
+.emptyState h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.emptyState button {
+  background: var(--accent-primary);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-top: 16px;
+  cursor: pointer;
+}
+        import React, { useState, useEffect, useRef } from 'react';
+import MessageList from './MessageList';
+import MessageInput from './MessageInput';
+import PinnedBar from './PinnedBar';
+import TypingIndicator from './TypingIndicator';
+import { getMessages, sendMessage, updateMessage, deleteMessage, pinMessage } from '../../firebase/realtime';
+import { setUserTyping, getUserTyping } from '../../firebase/realtime';
+import styles from './ChatArea.module.css';
+
+const ChatArea = ({ type, data, currentUser }) => {
+  const [messages, setMessages] = useState([]);
+  const [pinnedMessages, setPinnedMessages] = useState([]);
+  const [typingUsers, setTypingUsers] = useState({});
+  const [replyTo, setReplyTo] = useState(null);
+  const [editMessage, setEditMessage] = useState(null);
+  const messagesEndRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
+
+  const channelId = type === 'channel' ? data.id : type === 'dm' ? `dm_${currentUser.uid}_${data.userId}` : `group_${data.id}`;
+
+  useEffect(() => {
+    const unsubscribe = getMessages(channelId, (newMessages) => {
+      setMessages(newMessages);
+      const pinned = newMessages.filter(msg => msg.pinned && !msg.deleted);
+      setPinnedMessages(pinned);
+    });
+    const unsubscribeTyping = getUserTyping(channelId, (typing) => setTypingUsers(typing));
+    return () => {
+      unsubscribe();
+      unsubscribeTyping();
+    };
+  }, [channelId]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleSendMessage = async (content, attachments = []) => {
+    if (!content.trim() && attachments.length === 0) return;
+    const messageData = {
+      userId: currentUser.uid,
+      userName: localStorage.getItem('userName'),
+      userPhoto: localStorage.getItem('userPhoto'),
+      content: content,
+      attachments: attachments,
+      timestamp: Date.now(),
+      replyTo: replyTo,
+      edited: false,
+      deleted: false,
+      pinned: false,
+      reactions: {}
+    };
+    await sendMessage(channelId, messageData);
+    setReplyTo(null);
+    scrollToBottom();
+  };
+
+  const handleEditMessage = async (messageId, newContent) => {
+    await updateMessage(channelId, messageId, { content: newContent, edited: true, editedAt: Date.now() });
+    setEditMessage(null);
+  };
+
+  const handleDeleteMessage = async (messageId) => {
+    await deleteMessage(channelId, messageId);
+  };
+
+  const handlePinMessage = async (messageId, isPinned) => {
+    await pinMessage(channelId, messageId, isPinned);
+  };
+
+  const handleTyping = (isTyping) => {
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    setUserTyping(channelId, currentUser.uid, localStorage.getItem('userName'), isTyping);
+    if (isTyping) {
+      typingTimeoutRef.current = setTimeout(() => {
+        setUserTyping(channelId, currentUser.uid, localStorage.getItem('userName'), false);
+      }, 3000);
+    }
+  };
+
+  const getChannelName = () => {
+    if (type === 'channel') return `# ${data.name}`;
+    if (type === 'dm') return `@ ${data.userName}`;
+    return `👥 ${data.name}`;
+  };
+
+  const getChannelTopic = () => {
+    if (type === 'channel') return data.topic;
+    if (type === 'dm') return 'Doğrudan mesajlaşma';
+    return data.description || 'Grup sohbeti';
+  };
+
+  return (
+    <div className={styles.chatArea}>
+      <div className={styles.chatHeader}>
+        <div className={styles.headerInfo}>
+          <h2>{getChannelName()}</h2>
+          <div className={styles.topic}>{getChannelTopic()}</div>
+        </div>
+      </div>
+
+      {pinnedMessages.length > 0 && <PinnedBar messages={pinnedMessages} />}
+
+      <div className={styles.chatContent}>
+        <div className={styles.messagesArea}>
+          <MessageList
+            messages={messages}
+            currentUser={currentUser}
+            onEditMessage={handleEditMessage}
+            onDeleteMessage={handleDeleteMessage}
+            onPinMessage={handlePinMessage}
+            onReplyMessage={setReplyTo}
+            editMessageId={editMessage}
+            setEditMessageId={setEditMessage}
+          />
+          <TypingIndicator typingUsers={typingUsers} currentUser={currentUser} />
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {replyTo && (
+        <div className={styles.replyPreview}>
+          <div className={styles.replyContent}>
+            <span className={styles.replyLabel}>Yanıtlanıyor:</span>
+            <span className={styles.replyText}>{replyTo.content}</span>
+          </div>
+          <button onClick={() => setReplyTo(null)} className={styles.cancelReply}>✕</button>
+        </div>
+      )}
+
+      <MessageInput
+        onSendMessage={handleSendMessage}
+        onTyping={handleTyping}
+        onEditMessage={editMessage ? (content) => handleEditMessage(editMessage.id, content) : null}
+        editMessage={editMessage}
+        onCancelEdit={() => setEditMessage(null)}
+      />
+    </div>
+  );
+};
+
+export default ChatArea;
+        .chatArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  height: 100vh;
+  overflow: hidden;
+}
+
+.chatHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+.headerInfo h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.topic {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.chatContent {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.messagesArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.messageList {
+  flex: 1;
+}
+
+.messageGroup {
+  margin-bottom: 24px;
+}
+
+.dateDivider {
+  text-align: center;
+  margin: 16px 0;
+  position: relative;
+}
+
+.dateDivider span {
+  background: var(--bg-tertiary);
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.messageItem {
+  display: flex;
+  gap: 16px;
+  padding: 8px 16px;
+  margin: 4px 0;
+  border-radius: 8px;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.messageItem:hover {
+  background: var(--bg-tertiary);
+}
+
+.messageAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatarInitials {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+}
+
+.messageContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.messageHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.timestamp {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.edited {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.replyTo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  border-left: 3px solid var(--accent-primary);
+}
+
+.replyText {
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.messageText {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.deletedMessage {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.expandBtn {
+  background: none;
+  border: none;
+  color: var(--accent-primary);
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.messageActions {
+  position: absolute;
+  right: 16px;
+  top: -12px;
+  display: flex;
+  gap: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 4px;
+  z-index: 10;
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+}
+
+.actionBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.typingIndicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+}
+
+.typingDots {
+  display: flex;
+  gap: 4px;
+}
+
+.typingDots span {
+  width: 6px;
+  height: 6px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.typingDots span:nth-child(2) { animation-delay: 0.2s; }
+.typingDots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-8px); opacity: 1; }
+}
+
+.typingText {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.replyPreview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--bg-tertiary);
+  border-left: 3px solid var(--accent-primary);
+  margin: 0 20px 8px;
+  border-radius: 8px;
+}
+
+.replyLabel {
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+
+.cancelReply {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.messageInputContainer {
+  padding: 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.inputWrapper:focus-within {
+  border-color: var(--accent-primary);
+}
+
+.attachBtn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+}
+
+.messageInput {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  max-height: 120px;
+  outline: none;
+  padding: 4px 0;
+}
+
+.sendBtn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  color: var(--accent-primary);
+}
+
+.pinnedBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.pinnedMessages {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pinnedMessage {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+}
+
+.pinnedUserName {
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+        import React from 'react';
+import MessageItem from './MessageItem';
+import styles from './ChatArea.module.css';
+
+const MessageList = ({ messages, currentUser, onEditMessage, onDeleteMessage, onPinMessage, onReplyMessage, editMessageId, setEditMessageId }) => {
+  const groupMessagesByDate = (messages) => {
+    const groups = {};
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    messages.forEach(msg => {
+      const msgDate = new Date(msg.timestamp);
+      let dateKey;
+      if (msgDate.toDateString() === today.toDateString()) dateKey = 'Bugün';
+      else if (msgDate.toDateString() === yesterday.toDateString()) dateKey = 'Dün';
+      else dateKey = msgDate.toLocaleDateString('tr-TR');
+      if (!groups[dateKey]) groups[dateKey] = [];
+      groups[dateKey].push(msg);
+    });
+    return groups;
+  };
+
+  const groupedMessages = groupMessagesByDate(messages);
+
+  return (
+    <div className={styles.messageList}>
+      {Object.entries(groupedMessages).map(([date, msgs]) => (
+        <div key={date} className={styles.messageGroup}>
+          <div className={styles.dateDivider}><span>{date}</span></div>
+          {msgs.map((msg, index) => (
+            <MessageItem
+              key={msg.id}
+              message={msg}
+              isOwn={msg.userId === currentUser?.uid}
+              currentUser={currentUser}
+              onEdit={() => setEditMessageId(msg)}
+              onDelete={() => onDeleteMessage(msg.id)}
+              onPin={() => onPinMessage(msg.id, !msg.pinned)}
+              onReply={() => onReplyMessage(msg)}
+              isEditing={editMessageId?.id === msg.id}
+              previousMessage={index > 0 ? msgs[index - 1] : null}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default MessageList;
+        import React, { useState } from 'react';
+import styles from './ChatArea.module.css';
+
+const MessageItem = ({ message, isOwn, currentUser, onEdit, onDelete, onPin, onReply, isEditing, previousMessage }) => {
+  const [showActions, setShowActions] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const isLongMessage = message.content?.length > 500;
+  const displayContent = isExpanded || !isLongMessage ? message.content : message.content?.slice(0, 500) + '...';
+
+  const formatTime = (timestamp) => new Date(timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+  const getInitials = (name) => name?.charAt(0).toUpperCase() || '?';
+
+  const shouldShowAvatar = () => {
+    if (!previousMessage) return true;
+    const timeDiff = message.timestamp - previousMessage.timestamp;
+    return timeDiff > 300000 || message.userId !== previousMessage.userId;
+  };
+
+  const showAvatar = shouldShowAvatar();
+
+  return (
+    <div className={`${styles.messageItem} ${isOwn ? styles.ownMessage : ''}`} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+      {showAvatar && (
+        <div className={styles.messageAvatar}>
+          {message.userPhoto ? <img src={message.userPhoto} alt={message.userName} /> : <div className={styles.avatarInitials}>{getInitials(message.userName)}</div>}
+        </div>
+      )}
+      <div className={styles.messageContent}>
+        {showAvatar && (
+          <div className={styles.messageHeader}>
+            <span className={styles.userName}>{message.userName}</span>
+            <span className={styles.timestamp}>{formatTime(message.timestamp)}</span>
+            {message.edited && <span className={styles.edited}>(düzenlendi)</span>}
+          </div>
+        )}
+        {message.replyTo && (
+          <div className={styles.replyTo}>
+            <span>↪️</span>
+            <span className={styles.replyUser}>{message.replyTo.userName}</span>
+            <span className={styles.replyText}>{message.replyTo.content}</span>
+          </div>
+        )}
+        {message.deleted ? (
+          <div className={styles.deletedMessage}>🗑️ Silindi</div>
+        ) : (
+          <>
+            <div className={styles.messageText}>
+              {displayContent}
+              {isLongMessage && (
+                <button className={styles.expandBtn} onClick={() => setIsExpanded(!isExpanded)}>
+                  {isExpanded ? '▲ Göster daha az' : '▼ Devamını göster'}
+                </button>
+              )}
+            </div>
+            {message.attachments?.length > 0 && (
+              <div className={styles.attachments}>
+                {message.attachments.map((att, idx) => (
+                  <div key={idx} className={styles.attachment}>
+                    {att.type === 'image' && <img src={att.url} alt={att.name} className={styles.imageAttachment} />}
+                    {att.type === 'video' && <video src={att.url} controls className={styles.videoAttachment} />}
+                    {att.type === 'file' && <a href={att.url} download className={styles.fileAttachment}>📄 {att.name}</a>}
+                  </div>
+                ))}
+              </div>
+            )}
+            {message.reactions && Object.keys(message.reactions).length > 0 && (
+              <div className={styles.reactions}>
+                {Object.entries(message.reactions).map(([emoji, users]) => (
+                  <button key={emoji} className={`${styles.reactionPill} ${users.includes(currentUser?.uid) ? styles.active : ''}`}>
+                    {emoji} {users.length}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+      {isHovered && !message.deleted && (
+        <div className={styles.messageActions}>
+          <button onClick={onReply} className={styles.actionBtn} title="Yanıtla">💬</button>
+          <button onClick={onEdit} className={styles.actionBtn} title="Düzenle">✏️</button>
+          <button onClick={onDelete} className={styles.actionBtn} title="Sil">🗑️</button>
+          <button onClick={onPin} className={styles.actionBtn} title={message.pinned ? 'Sabitlemeyi kaldır' : 'Sabitle'}>📌</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MessageItem;
+        import React, { useState, useRef, useEffect } from 'react';
+import { storage } from '../../firebase/config';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import styles from './ChatArea.module.css';
+
+const MessageInput = ({ onSendMessage, onTyping, onEditMessage, editMessage, onCancelEdit }) => {
+  const [message, setMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null);
+  const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (editMessage) {
+      setMessage(editMessage.content);
+      inputRef.current?.focus();
+    }
+  }, [editMessage]);
+
+  const handleSend = () => {
+    if (onEditMessage) {
+      onEditMessage(message);
+      setMessage('');
+      onCancelEdit();
+    } else if (message.trim()) {
+      onSendMessage(message);
+      setMessage('');
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const handleTyping = (e) => {
+    setMessage(e.target.value);
+    if (!isTyping && e.target.value.length > 0) {
+      setIsTyping(true);
+      onTyping(true);
+    } else if (isTyping && e.target.value.length === 0) {
+      setIsTyping(false);
+      onTyping(false);
+    }
+  };
+
+  const uploadFile = async (file) => {
+    const fileRef = ref(storage, `uploads/${Date.now()}_${file.name}`);
+    const uploadTask = uploadBytesResumable(fileRef, file);
+    uploadTask.on('state_changed', (snapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      setUploadProgress(progress);
+    });
+    const snapshot = await uploadTask;
+    const url = await getDownloadURL(snapshot.ref);
+    let type = 'file';
+    if (file.type.startsWith('image/')) type = 'image';
+    else if (file.type.startsWith('video/')) type = 'video';
+    return { name: file.name, url: url, type: type, size: file.size };
+  };
+
+  const handleFileUpload = async (files) => {
+    const attachments = [];
+    for (const file of files) {
+      const attachment = await uploadFile(file);
+      attachments.push(attachment);
+    }
+    onSendMessage(message, attachments);
+    setMessage('');
+    setUploadProgress(null);
+  };
+
+  return (
+    <div className={styles.messageInputContainer}>
+      {uploadProgress !== null && (
+        <div className={styles.uploadProgress}>
+          <div className={styles.progressBar} style={{ width: `${uploadProgress}%` }} />
+          <span>Yükleniyor... %{Math.round(uploadProgress)}</span>
+        </div>
+      )}
+      <div className={styles.inputWrapper}>
+        <button className={styles.attachBtn} onClick={() => fileInputRef.current?.click()} title="Dosya ekle">📎</button>
+        <textarea
+          ref={inputRef}
+          value={message}
+          onChange={handleTyping}
+          onKeyPress={handleKeyPress}
+          placeholder={editMessage ? "Mesajını düzenle..." : "Mesajını yaz..."}
+          className={styles.messageInput}
+          rows="1"
+        />
+        <button onClick={handleSend} className={styles.sendBtn} disabled={!message.trim() && !editMessage}>
+          {editMessage ? '✓' : '📤'}
+        </button>
+        {editMessage && <button onClick={onCancelEdit} className={styles.cancelEditBtn}>✕</button>}
+        <input type="file" ref={fileInputRef} style={{ display: 'none' }} multiple onChange={(e) => handleFileUpload(Array.from(e.target.files))} />
+      </div>
+    </div>
+  );
+};
+
+export default MessageInput;
+          import React from 'react';
+import styles from './ChatArea.module.css';
+
+const TypingIndicator = ({ typingUsers, currentUser }) => {
+  const typingList = Object.values(typingUsers).filter(user => user.userId !== currentUser?.uid);
+  if (typingList.length === 0) return null;
+
+  const getTypingText = () => {
+    if (typingList.length === 1) return `${typingList[0].userName} yazıyor...`;
+    if (typingList.length === 2) return `${typingList[0].userName} ve ${typingList[1].userName} yazıyor...`;
+    return `${typingList.length} kişi yazıyor...`;
+  };
+
+  return (
+    <div className={styles.typingIndicator}>
+      <div className={styles.typingDots}><span></span><span></span><span></span></div>
+      <span className={styles.typingText}>{getTypingText()}</span>
+    </div>
+  );
+};
+
+export default TypingIndicator;
+          import React from 'react';
+import styles from './ChatArea.module.css';
+
+const PinnedBar = ({ messages }) => {
+  return (
+    <div className={styles.pinnedBar}>
+      <div className={styles.pinnedIcon}>📌</div>
+      <div className={styles.pinnedMessages}>
+        {messages.map((msg, idx) => (
+          <div key={msg.id} className={styles.pinnedMessage}>
+            <span className={styles.pinnedUserName}>{msg.userName}:</span>
+            <span className={styles.pinnedContent}>
+              {msg.content.length > 50 ? msg.content.slice(0, 50) + '...' : msg.content}
+            </span>
+            {idx < messages.length - 1 && <span className={styles.separator}>•</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default PinnedBar;
+          import React, { useState, useRef, useEffect } from 'react';
+import { storage } from '../../firebase/config';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { updateUserStatus } from '../../firebase/realtime';
+import { rtdb } from '../../firebase/config';
+import { ref as dbRef, onValue, off } from 'firebase/database';
+import styles from './Profile.module.css';
+
+const ProfileCard = ({ user, onClose, onUpdate }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [userName, setUserName] = useState(localStorage.getItem('userName') || '');
+  const [status, setStatus] = useState('online');
+  const [customStatus, setCustomStatus] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [photoURL, setPhotoURL] = useState(localStorage.getItem('userPhoto') || null);
+  const [stats, setStats] = useState({ friends: 0, groups: 0 });
+  
+  const fileInputRef = useRef(null);
+
+  const statusOptions = [
+    { value: 'online', label: 'Çevrimiçi', icon: '🟢', color: '#10b981' },
+    { value: 'away', label: 'Boşta', icon: '🟡', color: '#f59e0b' },
+    { value: 'dnd', label: 'Rahatsız Etmeyin', icon: '🔴', color: '#ef4444' },
+    { value: 'invisible', label: 'Görünmez', icon: '⚫', color: '#6b7280' }
+  ];
+
+  useEffect(() => {
+    const savedStatus = localStorage.getItem('userStatus');
+    const savedCustomStatus = localStorage.getItem('customStatus');
+    if (savedStatus) setStatus(savedStatus);
+    if (savedCustomStatus) setCustomStatus(savedCustomStatus);
+    
+    // İstatistikleri yükle
+    const friendsRef = dbRef(rtdb, `friends/${user.uid}`);
+    onValue(friendsRef, (snapshot) => {
+      const data = snapshot.val();
+      setStats(prev => ({ ...prev, friends: data ? Object.keys(data).length : 0 }));
+    }, { onlyOnce: true });
+    
+    const groupsRef = dbRef(rtdb, 'groups');
+    onValue(groupsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const userGroups = Object.values(data).filter(g => g.members?.includes(user.uid));
+        setStats(prev => ({ ...prev, groups: userGroups.length }));
+      }
+    }, { onlyOnce: true });
+  }, [user]);
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Dosya boyutu 2MB\'dan küçük olmalıdır!');
+      return;
+    }
+    setIsUploading(true);
+    const storageRef = ref(storage, `avatars/${user.uid}_${Date.now()}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+    uploadTask.on('state_changed', (snapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      setUploadProgress(progress);
+    });
+    try {
+      const snapshot = await uploadTask;
+      const url = await getDownloadURL(snapshot.ref);
+      setPhotoURL(url);
+      localStorage.setItem('userPhoto', url);
+      await updateUserStatus(user.uid, userName, status, customStatus, url);
+      onUpdate?.({ photo: url });
+    } catch (error) {
+      console.error('Fotoğraf yükleme hatası:', error);
+      alert('Fotoğraf yüklenirken hata oluştu!');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!userName.trim()) {
+      alert('Kullanıcı adı boş olamaz!');
+      return;
+    }
+    localStorage.setItem('userName', userName);
+    localStorage.setItem('userStatus', status);
+    localStorage.setItem('customStatus', customStatus);
+    await updateUserStatus(user.uid, userName, status, customStatus, photoURL);
+    onUpdate?.({ name: userName, status, customStatus });
+    setIsEditing(false);
+  };
+
+  const getStatusIcon = () => {
+    const option = statusOptions.find(opt => opt.value === status);
+    return option?.icon || '🟢';
+  };
+
+  return (
+    <div className={styles.profileOverlay} onClick={onClose}>
+      <div className={styles.profileCard} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.profileHeader}>
+          <h3>Profilim</h3>
+          <button onClick={onClose} className={styles.closeBtn}>✕</button>
+        </div>
+
+        <div className={styles.avatarSection}>
+          <div className={styles.avatarLarge}>
+            {photoURL ? <img src={photoURL} alt={userName} /> : <div className={styles.avatarPlaceholderLarge}>{userName?.charAt(0).toUpperCase()}</div>}
+            {isUploading && (
+              <div className={styles.uploadOverlay}>
+                <div className={styles.uploadProgressBar} style={{ width: `${uploadProgress}%` }} />
+                <span>{Math.round(uploadProgress)}%</span>
+              </div>
+            )}
+          </div>
+          <button className={styles.changePhotoBtn} onClick={() => fileInputRef.current?.click()} disabled={isUploading}>📷 Fotoğraf Değiştir</button>
+          <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoUpload} />
+        </div>
+
+        <div className={styles.profileInfo}>
+          {isEditing ? (
+            <>
+              <div className={styles.editField}>
+                <label>Kullanıcı Adı</label>
+                <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} className={styles.nameInput} maxLength={30} autoFocus />
+              </div>
+              <div className={styles.editField}>
+                <label>Durum</label>
+                <div className={styles.statusSelector}>
+                  {statusOptions.map(opt => (
+                    <button key={opt.value} className={`${styles.statusOption} ${status === opt.value ? styles.active : ''}`} onClick={() => setStatus(opt.value)}>
+                      <span style={{ color: opt.color }}>{opt.icon}</span> {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className={styles.editField}>
+                <label>Özel Durum</label>
+                <input type="text" value={customStatus} onChange={(e) => setCustomStatus(e.target.value)} placeholder="Özel durum mesajı..." className={styles.customStatusInput} maxLength={50} />
+              </div>
+              <div className={styles.editActions}>
+                <button onClick={() => setIsEditing(false)} className={styles.cancelBtn}>İptal</button>
+                <button onClick={handleSave} className={styles.saveBtn}>Kaydet</button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={styles.userNameDisplay}>
+                <h2>{userName}</h2>
+                <button onClick={() => setIsEditing(true)} className={styles.editBtn}>✏️</button>
+              </div>
+              <div className={styles.userStatusDisplay}>
+                <span className={styles.statusIndicator} style={{ background: statusOptions.find(o => o.value === status)?.color }} />
+                <span>{statusOptions.find(o => o.value === status)?.label}</span>
+              </div>
+              {customStatus && <div className={styles.customStatusDisplay}>{getStatusIcon()} {customStatus}</div>}
+            </>
+          )}
+        </div>
+
+        <div className={styles.profileStats}>
+          <div className={styles.statItem}><div className={styles.statValue}>{stats.friends}</div><div className={styles.statLabel}>Arkadaş</div></div>
+          <div className={styles.statDivider} />
+          <div className={styles.statItem}><div className={styles.statValue}>{stats.groups}</div><div className={styles.statLabel}>Grup</div></div>
+        </div>
+
+        <div className={styles.profileActions}>
+          <button className={styles.actionBtn}><span>🎨</span><span>Tema</span></button>
+          <button className={styles.actionBtn}><span>🔔</span><span>Bildirimler</span></button>
+          <button className={styles.actionBtn}><span>🔒</span><span>Güvenlik</span></button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProfileCard;
+          import React, { useState, useEffect } from 'react';
+import { rtdb } from '../../firebase/config';
+import { ref, get, onValue, off } from 'firebase/database';
+import { blockUser, unblockUser, isUserBlocked } from '../../firebase/realtime';
+import styles from './Profile.module.css';
+
+const UserProfilePopup = ({ user, currentUserId, onClose, onDM, onBlock }) => {
+  const [userData, setUserData] = useState(null);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [mutualFriends, setMutualFriends] = useState([]);
+
+  useEffect(() => {
+    const userId = user.id || user.userId;
+    const userRef = ref(rtdb, `users/${userId}`);
+    onValue(userRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) setUserData(data);
+      setIsLoading(false);
+    });
+    checkBlockStatus();
+    loadMutualFriends();
+    return () => off(userRef);
+  }, [user]);
+
+  const checkBlockStatus = async () => {
+    const userId = user.id || user.userId;
+    const blocked = await isUserBlocked(currentUserId, userId);
+    setIsBlocked(blocked);
+  };
+
+  const loadMutualFriends = async () => {
+    const userId = user.id || user.userId;
+    const currentUserFriendsRef = ref(rtdb, `friends/${currentUserId}`);
+    const targetUserFriendsRef = ref(rtdb, `friends/${userId}`);
+    const [currentSnapshot, targetSnapshot] = await Promise.all([get(currentUserFriendsRef), get(targetUserFriendsRef)]);
+    const currentFriends = currentSnapshot.val() ? Object.keys(currentSnapshot.val()) : [];
+    const targetFriends = targetSnapshot.val() ? Object.keys(targetSnapshot.val()) : [];
+    const mutual = currentFriends.filter(id => targetFriends.includes(id));
+    setMutualFriends(mutual);
+  };
+
+  const handleBlock = async () => {
+    const userId = user.id || user.userId;
+    if (isBlocked) {
+      await unblockUser(currentUserId, userId);
+      setIsBlocked(false);
+      onBlock?.(userId, false);
+    } else {
+      await blockUser(currentUserId, userId);
+      setIsBlocked(true);
+      onBlock?.(userId, true);
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch(status?.status) {
+      case 'online': return '🟢';
+      case 'away': return '🟡';
+      case 'dnd': return '🔴';
+      default: return '⚫';
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch(status?.status) {
+      case 'online': return 'Çevrimiçi';
+      case 'away': return 'Boşta';
+      case 'dnd': return 'Rahatsız Etmeyin';
+      default: return 'Çevrimdışı';
+    }
+  };
+
+  const formatDate = (timestamp) => {
+    if (!timestamp) return 'Bilinmiyor';
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now - date;
+    if (diff < 60000) return 'Az önce';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)} dakika önce`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)} saat önce`;
+    return date.toLocaleDateString('tr-TR');
+  };
+
+  if (isLoading) {
+    return (
+      <div className={styles.popupOverlay} onClick={onClose}>
+        <div className={styles.popupCard}><div className={styles.loadingSpinner}></div></div>
+      </div>
+    );
+  }
+
+  const displayName = userData?.name || user.userName || 'Kullanıcı';
+  const displayPhoto = userData?.photo || user.photo;
+  const userStatus = userData?.status || { status: 'offline' };
+
+  return (
+    <div className={styles.popupOverlay} onClick={onClose}>
+      <div className={styles.popupCard} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.popupHeader}>
+          <button onClick={onClose} className={styles.closeBtn}>✕</button>
+        </div>
+        <div className={styles.popupAvatar}>
+          {displayPhoto ? <img src={displayPhoto} alt={displayName} /> : <div className={styles.avatarLarge}>{displayName.charAt(0).toUpperCase()}</div>}
+          <div className={`${styles.statusBadge} ${styles[userStatus.status]}`}>{getStatusIcon(userStatus)}</div>
+        </div>
+        <div className={styles.popupInfo}>
+          <h2>{displayName}</h2>
+          <div className={styles.userStatusText}>
+            <span className={styles.statusDot} style={{ background: userStatus.status === 'online' ? '#10b981' : userStatus.status === 'away' ? '#f59e0b' : userStatus.status === 'dnd' ? '#ef4444' : '#6b7280' }} />
+            <span>{getStatusText(userStatus)}</span>
+          </div>
+          {userStatus.customStatus && <div className={styles.customStatus}>{getStatusIcon(userStatus)} {userStatus.customStatus}</div>}
+          <div className={styles.lastSeen}>Son görülme: {formatDate(userStatus?.lastSeen)}</div>
+        </div>
+
+        {mutualFriends.length > 0 && (
+          <div className={styles.mutualFriends}>
+            <div className={styles.sectionTitle}>👥 Ortak Arkadaşlar <span className={styles.mutualCount}>{mutualFriends.length}</span></div>
+            <div className={styles.mutualList}>
+              {mutualFriends.slice(0, 5).map(friendId => (
+                <div key={friendId} className={styles.mutualItem}>
+                  <div className={styles.mutualAvatar}>{friendId.charAt(0).toUpperCase()}</div>
+                  <span>{friendId.slice(0, 8)}...</span>
+                </div>
+              ))}
+              {mutualFriends.length > 5 && <div className={styles.mutualMore}>+{mutualFriends.length - 5} daha</div>}
+            </div>
+          </div>
+        )}
+
+        <div className={styles.popupActions}>
+          <button className={styles.dmButton} onClick={() => { onDM?.(user); onClose(); }}>💬 Mesaj Gönder</button>
+          <button className={`${styles.blockButton} ${isBlocked ? styles.unblock : ''}`} onClick={handleBlock}>
+            {isBlocked ? '🔓 Engeli Kaldır' : '🚫 Engelle'}
+          </button>
+        </div>
+        <div className={styles.reportSection}>
+          <button className={styles.reportButton}>🚩 Kullanıcıyı Raporla</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default UserProfilePopup;
+          .profileOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.profileCard, .popupCard {
+  background: var(--bg-secondary);
+  border-radius: 24px;
+  width: 90%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.profileHeader, .popupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.profileHeader h3, .popupHeader h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+.closeBtn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); padding: 4px 8px; border-radius: 8px; }
+.closeBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.avatarSection { display: flex; flex-direction: column; align-items: center; padding: 24px; border-bottom: 1px solid var(--border-color); }
+.avatarLarge {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  margin-bottom: 16px;
+}
+.avatarLarge img { width: 100%; height: 100%; object-fit: cover; }
+.avatarPlaceholderLarge {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 600;
+  color: white;
+}
+.uploadOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+}
+.uploadProgressBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: var(--accent-primary);
+  transition: width 0.3s;
+}
+.changePhotoBtn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.changePhotoBtn:hover { background: var(--bg-hover); border-color: var(--accent-primary); }
+
+.profileInfo { padding: 20px 24px; border-bottom: 1px solid var(--border-color); }
+.userNameDisplay { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px; }
+.userNameDisplay h2 { font-size: 24px; font-weight: 600; color: var(--text-primary); }
+.editBtn { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--text-secondary); }
+.userStatusDisplay { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; }
+.statusIndicator { width: 10px; height: 10px; border-radius: 50%; }
+.customStatusDisplay { text-align: center; font-size: 13px; color: var(--text-muted); padding: 8px; background: var(--bg-tertiary); border-radius: 12px; }
+
+.editField { margin-bottom: 20px; }
+.editField label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
+.nameInput, .customStatusInput {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+.nameInput:focus, .customStatusInput:focus { outline: none; border-color: var(--accent-primary); }
+.statusSelector { display: flex; flex-wrap: wrap; gap: 8px; }
+.statusOption {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.statusOption:hover { background: var(--bg-hover); border-color: var(--accent-primary); }
+.statusOption.active { background: rgba(59, 130, 246, 0.2); border-color: var(--accent-primary); color: var(--accent-primary); }
+.editActions { display: flex; gap: 12px; margin-top: 20px; }
+.cancelBtn, .saveBtn { flex: 1; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+.cancelBtn { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); }
+.saveBtn { background: var(--accent-primary); border: none; color: white; }
+
+.profileStats { display: flex; justify-content: space-around; padding: 20px 24px; border-bottom: 1px solid var(--border-color); }
+.statItem { text-align: center; }
+.statValue { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+.statLabel { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.statDivider { width: 1px; background: var(--border-color); }
+
+.profileActions { display: flex; gap: 12px; padding: 20px 24px; }
+.actionBtn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+.actionBtn:hover { background: var(--bg-hover); border-color: var(--accent-primary); color: var(--text-primary); }
+
+.popupAvatar { position: relative; display: flex; justify-content: center; margin-top: -40px; margin-bottom: 20px; }
+.popupAvatar .avatarLarge { width: 100px; height: 100px; margin-bottom: 0; }
+.statusBadge {
+  position: absolute;
+  bottom: 4px;
+  right: calc(50% - 50px);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border: 2px solid var(--bg-secondary);
+}
+.popupInfo { text-align: center; padding: 0 20px 20px; border-bottom: 1px solid var(--border-color); }
+.popupInfo h2 { font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+.userStatusText { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 8px; font-size: 13px; color: var(--text-secondary); }
+.statusDot { width: 8px; height: 8px; border-radius: 50%; }
+.lastSeen { font-size: 11px; color: var(--text-muted); }
+.mutualFriends { padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+.sectionTitle { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; display: flex; justify-content: space-between; }
+.mutualList { display: flex; flex-wrap: wrap; gap: 8px; }
+.mutualItem { display: flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--bg-tertiary); border-radius: 20px; font-size: 12px; }
+.mutualAvatar { width: 20px; height: 20px; border-radius: 50%; background: var(--accent-primary); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: white; }
+.popupActions { display: flex; flex-direction: column; gap: 8px; padding: 20px; }
+.dmButton, .blockButton { padding: 10px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
+.dmButton { background: var(--accent-primary); border: none; color: white; }
+.blockButton { background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--accent-danger); }
+.blockButton.unblock { color: var(--accent-success); }
+.reportSection { padding: 0 20px 20px; text-align: center; }
+.reportButton { background: none; border: none; font-size: 12px; color: var(--text-muted); cursor: pointer; }
+.loadingSpinner { width: 40px; height: 40px; border: 3px solid var(--border-color); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 40px auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+          import React, { useState, useEffect, useRef } from 'react';
+import styles from './CallModal.module.css';
+
+const CallModal = ({ isOpen, onClose, callType, callerName, calleeName, isIncoming }) => {
+  const [callDuration, setCallDuration] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(true);
+  const [callStatus, setCallStatus] = useState(isIncoming ? 'incoming' : 'calling');
+  
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (callStatus === 'active') {
+      timerRef.current = setInterval(() => setCallDuration(prev => prev + 1), 1000);
+    }
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [callStatus]);
+
+  useEffect(() => {
+    if (isOpen && !isIncoming) {
+      setTimeout(() => {
+        setIsConnecting(false);
+        setCallStatus('active');
+      }, 2000);
+    }
+  }, [isOpen, isIncoming]);
+
+  const acceptCall = () => {
+    setIsConnecting(false);
+    setCallStatus('active');
+  };
+
+  const rejectCall = () => {
+    setCallStatus('rejected');
+    setTimeout(() => onClose(), 2000);
+  };
+
+  const endCall = () => {
+    onClose();
+  };
+
+  const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className={styles.callOverlay}>
+      <div className={`${styles.callModal} ${callType === 'video' ? styles.videoCall : styles.voiceCall}`}>
+        {callType === 'voice' && (
+          <div className={styles.voiceContainer}>
+            <div className={styles.voiceAvatar}>
+              <div className={styles.avatarLarge}>{callerName?.charAt(0).toUpperCase() || calleeName?.charAt(0).toUpperCase()}</div>
+              {(callStatus === 'calling' || callStatus === 'incoming') && (
+                <div className={styles.waveAnimation}><span></span><span></span><span></span><span></span></div>
+              )}
+            </div>
+            <div className={styles.callerInfo}>
+              <h3>{isIncoming ? calleeName : callerName}</h3>
+              <p>{callStatus === 'calling' ? 'Aranıyor...' : callStatus === 'incoming' ? 'Sizi arıyor...' : callStatus === 'active' ? 'Görüşme' : 'Arama reddedildi'}</p>
+            </div>
+          </div>
+        )}
+
+        {isConnecting && (
+          <div className={styles.connectingStatus}>
+            <div className={styles.spinner}></div>
+            <p>Bağlantı kuruluyor...</p>
+          </div>
+        )}
+
+        {callStatus === 'active' && <div className={styles.callDuration}>{formatDuration(callDuration)}</div>}
+
+        <div className={styles.callControls}>
+          {callStatus === 'active' && (
+            <>
+              <button onClick={() => setIsMuted(!isMuted)} className={`${styles.controlBtn} ${isMuted ? styles.active : ''}`}>
+                {isMuted ? '🔇' : '🎤'}
+              </button>
+              {callType === 'video' && (
+                <button onClick={() => setIsVideoOff(!isVideoOff)} className={`${styles.controlBtn} ${isVideoOff ? styles.active : ''}`}>
+                  {isVideoOff ? '📹❌' : '📹'}
+                </button>
+              )}
+            </>
+          )}
+          
+          {isIncoming && callStatus === 'incoming' ? (
+            <>
+              <button onClick={rejectCall} className={`${styles.controlBtn} ${styles.rejectBtn}`}>❌ Reddet</button>
+              <button onClick={acceptCall} className={`${styles.controlBtn} ${styles.acceptBtn}`}>📞 Kabul Et</button>
+            </>
+          ) : callStatus === 'calling' ? (
+            <button onClick={endCall} className={`${styles.controlBtn} ${styles.endCallBtn}`}>📞 İptal</button>
+          ) : callStatus === 'active' ? (
+            <button onClick={endCall} className={`${styles.controlBtn} ${styles.endCallBtn}`}>📞 Sonlandır</button>
+          ) : callStatus === 'rejected' ? (
+            <button onClick={onClose} className={`${styles.controlBtn} ${styles.endCallBtn}`}>Kapat</button>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CallModal;
+          .callOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.callModal {
+  background: var(--bg-secondary);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  min-width: 400px;
+}
+
+.callModal.voiceCall { width: 400px; padding: 32px; }
+
+.voiceContainer { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+.avatarLarge {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 600;
+  color: white;
+}
+.waveAnimation {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+}
+.waveAnimation span {
+  width: 4px;
+  height: 20px;
+  background: var(--accent-primary);
+  border-radius: 2px;
+  animation: wave 0.8s infinite;
+}
+.waveAnimation span:nth-child(2) { animation-delay: 0.2s; }
+.waveAnimation span:nth-child(3) { animation-delay: 0.4s; }
+.waveAnimation span:nth-child(4) { animation-delay: 0.6s; }
+@keyframes wave {
+  0%, 100% { height: 8px; }
+  50% { height: 24px; }
+}
+.callerInfo { text-align: center; }
+.callerInfo h3 { font-size: 24px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+.callerInfo p { font-size: 14px; color: var(--text-muted); }
+
+.connectingStatus {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  border-radius: 12px;
+}
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.callDuration {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-family: monospace;
+  color: white;
+}
+
+.callControls {
+  position: absolute;
+  bottom: 30px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px;
+}
+.controlBtn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+ 
